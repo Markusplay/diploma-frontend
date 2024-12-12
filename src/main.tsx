@@ -5,7 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import { Login } from './screens/Login';
 import { Register } from './screens/Register';
-import AuthWrapper from './components/AuthWrapper';
+import ProtectedRoute from './components/ProtectedRoute.tsx';
 import { queryClient } from './lib/queryClient';
 import { K3Page } from './screens/K3Page';
 import { LoadPage } from './screens/LoadPage';
@@ -16,7 +16,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        element: <AuthWrapper />,
+        element: <ProtectedRoute />,
         children: [
           {
             path: '/',

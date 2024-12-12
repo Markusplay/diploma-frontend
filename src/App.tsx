@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { setupResponseInterceptor } from './lib/api';
+import { setupInterceptors } from '@/lib/api.ts';
 
 function App() {
   const navigate = useNavigate();
@@ -8,7 +8,7 @@ function App() {
 
   if (!loading) {
     setLoading(true);
-    setupResponseInterceptor(navigate);
+    setupInterceptors(navigate);
   }
 
   return <Outlet />;

@@ -13,6 +13,7 @@ import { useTeachers } from '../hooks/use-teachers';
 import LoadService from '../services/LoadService';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { QUERY_KEY } from '../lib/constants';
+import { queryClient } from '@/lib/queryClient.ts';
 
 export function LoadPage() {
   const navigate = useNavigate();
@@ -65,7 +66,13 @@ export function LoadPage() {
           <CardTitle>Розподіл навантаження</CardTitle>
 
           <div className="flex justify-between">
-            <Button onClick={() => navigate(-1)} size="lg">
+            <Button
+              onClick={() => {
+                navigate(-1);
+                queryClient.removeQueries({ queryKey: [QUERY_KEY.LOADS] });
+              }}
+              size="lg"
+            >
               Назад
             </Button>
             <div />

@@ -8,6 +8,8 @@ import { Input } from '../components/ui/input';
 import AuthService from '../services/AuthService';
 import { useToast } from '@/hooks/use-toast.ts';
 import { AxiosError } from 'axios';
+import { useMutation } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -26,17 +28,18 @@ export function Login() {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const formData = new FormData();
-    formData.append('username', values.username);
-    formData.append('password', values.password);
-
-    try {
-      const { data } = await AuthService.signIn(formData);
-
-      localStorage.setItem('token', JSON.stringify(data.access_token));
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      const formData = new FormData();
+      formData.append('username', values.username);
+      formData.append('password', values.password);
+      return AuthService.signIn(formData);
+    },
+    onSuccess: (data) => {
+      localStorage.setItem('token', JSON.stringify(data.data.access_token));
       navigate('/');
-    } catch (error) {
+    },
+    onError: (error) => {
       if (error instanceof AxiosError && error.response) {
         toast({
           title: 'Помилка авторизації',
@@ -44,7 +47,11 @@ export function Login() {
           variant: 'destructive',
         });
       }
-    }
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    mutate(values);
   };
 
   return (
@@ -87,7 +94,7 @@ export function Login() {
             />
 
             <Button className="w-full" type="submit">
-              Увійти
+              {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <p>Увійти</p>}
             </Button>
 
             <p className="text-center dark:text-gray-400 ">

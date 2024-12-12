@@ -2,10 +2,9 @@ import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
-import type { CourseType, SemesterType } from '../../types/types';
+import type { CourseType, SemesterType } from '@/types/types.ts';
 import { zodResolver } from '@hookform/resolvers/zod';
-
-import type { LoadType } from '../../types/LoadType';
+import type { LoadType } from '@/types/LoadType.ts';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import type { z } from 'zod';
 import {
@@ -17,12 +16,15 @@ import {
   SelectValue,
 } from '../ui/select';
 import formSchema from './schema';
-import { useToast } from '../../hooks/use-toast';
-import { api } from '../../lib/api';
-import { useGroups } from '../../hooks/use-groups';
-import { useSubjects } from '../../hooks/use-subjects';
-import { useTeachers } from '../../hooks/use-teachers';
+import { useToast } from '@/hooks/use-toast.ts';
+import { useGroups } from '@/hooks/use-groups.ts';
+import { useSubjects } from '@/hooks/use-subjects.ts';
+import { useTeachers } from '@/hooks/use-teachers.ts';
 import { FC, useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { queryClient } from '@/lib/queryClient.ts';
+import { QUERY_KEY } from '@/lib/constants.ts';
+import LoadService from '@/services/LoadService.ts';
 
 interface LoadFormProps {
   isOpen: boolean;
@@ -41,11 +43,28 @@ const LoadForm: FC<LoadFormProps> = ({ isOpen, onOpenChange, loadItem }) => {
     mode: 'onChange',
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: LoadType }) => LoadService.update(id, data),
+    onSuccess: () => {
+      toast({
+        title: 'Дані успішно оновлено',
+        variant: 'success',
+      });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY.LOADS] });
+    },
+    onError: () => {
+      toast({
+        title: 'Помилка під час оновлення',
+        variant: 'destructive',
+      });
+    },
+  });
+
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (
     values: z.infer<typeof formSchema>,
   ) => {
     const createDto: LoadType = {
-      id: loadItem?.id || 0,
+      id: loadItem?.id ?? '',
       cathedra: values.cathedra,
       consultHour: values.consultHour,
       controlWorkHour: values.controlWorkHour,
@@ -77,17 +96,19 @@ const LoadForm: FC<LoadFormProps> = ({ isOpen, onOpenChange, loadItem }) => {
 
     // updateItem(createDto, loadItem?.id || 0);
 
-    api.put(`/load/${loadItem?.id}`, createDto).then((res) =>
-      res.status === 200
-        ? toast({
-            title: 'Навантаження успішно оновлено',
-            variant: 'success',
-          })
-        : toast({
-            title: 'Помилка під час оновлення навантаження',
-            variant: 'destructive',
-          }),
-    );
+    updateMutation.mutate({ id: loadItem?.id ?? '', data: createDto });
+
+    // api.put(`/load/${loadItem?.id}`, createDto).then((res) =>
+    //   res.status === 200
+    //     ? toast({
+    //         title: 'Навантаження успішно оновлено',
+    //         variant: 'success',
+    //       })
+    //     : toast({
+    //         title: 'Помилка під час оновлення навантаження',
+    //         variant: 'destructive',
+    //       }),
+    // );
     onOpenChange(false);
   };
 

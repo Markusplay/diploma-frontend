@@ -8,6 +8,8 @@ import { Input } from '../components/ui/input';
 import AuthService from '../services/AuthService';
 import { AxiosError } from 'axios';
 import { useToast } from '@/hooks/use-toast.ts';
+import { useMutation } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -32,11 +34,12 @@ export function Register() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const { status } = await AuthService.signUp(values);
-      if (status === 201) navigate('/login');
-    } catch (error) {
+  const { mutate, isPending } = useMutation({
+    mutationFn: (values: z.infer<typeof formSchema>) => AuthService.signUp(values),
+    onSuccess: () => {
+      navigate('/login');
+    },
+    onError: (error) => {
       if (error instanceof AxiosError && error.response) {
         toast({
           title: 'Помилка реєстрації',
@@ -44,7 +47,11 @@ export function Register() {
           variant: 'destructive',
         });
       }
-    }
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    mutate(values);
   }
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -95,7 +102,11 @@ export function Register() {
             />
 
             <Button className="w-full" type="submit">
-              Зараєстуватися
+              {isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <p>Зараєстуватися</p>
+              )}
             </Button>
             <p className="text-center dark:text-gray-400 ">
               Вже є акаунт?{' '}

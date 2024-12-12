@@ -1,9 +1,10 @@
 import { RegisterRequestBody } from '@/types/RegisterRequestBody';
 import { api } from '../lib/api';
+import { Token } from '@/types/Token.ts';
 
 class AuthService {
-  static async signIn(formData: FormData) {
-    return api.post('/token', formData, {
+  static signIn(formData: FormData) {
+    return api.post<Token>('/token', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

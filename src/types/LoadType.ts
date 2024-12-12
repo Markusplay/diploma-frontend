@@ -6,7 +6,7 @@ import type { PaymentForm, StudyType } from './enums';
 import type { CourseType, SemesterType } from './types';
 
 export type LoadType = {
-  id: number;
+  id: string;
   paymentForm: PaymentForm; // форма оплати
   studyType: StudyType; // вид навчання
   subject?: SubjectType;

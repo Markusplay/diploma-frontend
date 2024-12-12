@@ -10,6 +10,10 @@ class LoadService {
     return api.post('/load');
   }
 
+  static update(id: string, body: LoadType) {
+    return api.put(`/load/${id}`, body);
+  }
+
   static download() {
     return downloadFile('load', 'Report.pdf');
   }

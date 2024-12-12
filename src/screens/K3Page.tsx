@@ -8,7 +8,7 @@ import { downloadFile } from '../lib/downloadFile';
 import K3Service from '../services/K3Service';
 import type { K3ItemTypeWithId } from '../types/K3ItemType';
 import { ArrowDown, Eye, Loader2 } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import LoadService from '../services/LoadService';
 import { useGroups } from '../hooks/use-groups';
 import { useSubjects } from '../hooks/use-subjects';
@@ -27,13 +27,22 @@ export function K3Page() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedK3Item, setSelectedK3Item] = useState<K3ItemTypeWithId | null>(null);
 
-  const { data: k3Items, isLoading } = useQuery({
+  const {
+    data: k3Items,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: [QUERY_KEY.K3],
     queryFn: async () => {
       const { data } = await K3Service.getAll();
       return data;
     },
+    staleTime: 0,
   });
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   const deleteMutation = useMutation({
     mutationFn: (k3ItemId: string) => K3Service.delete(k3ItemId),
