@@ -32,14 +32,14 @@ export const getK3Columns = ({
     accessorKey: 'subjectId',
     header: 'Дисципліна',
     cell: ({ row }) =>
-      subjectsData?.find((subject) => subject.subjectId.toString() === row.original.subjectId)
+      subjectsData?.find((subject) => subject.subjectId.toString() === row.original.subjectId.toString())
         ?.fullName,
   },
   {
     accessorKey: 'groupId',
     header: 'Група',
     cell: ({ row }) =>
-      groupsData?.find((group) => group.groupId.toString() === row.original.groupId)?.groupName,
+      groupsData?.find((group) => group.groupId.toString() === row.original.groupId.toString())?.groupName,
   },
   {
     accessorKey: 'semester',
