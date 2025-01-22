@@ -12,8 +12,8 @@ import { useMutation } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
-  username: z.string().min(1, 'Username is required'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  username: z.string().min(1, 'Обов`язкове поле'),
+  password: z.string().min(6, 'Пароль повинен мати хоча б 6 символів'),
 });
 
 export function Login() {
