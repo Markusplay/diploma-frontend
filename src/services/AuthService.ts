@@ -1,6 +1,7 @@
 import { RegisterRequestBody } from '@/types/RegisterRequestBody';
 import { api } from '../lib/api';
 import { Token } from '@/types/Token.ts';
+import { User } from '@/types/user.ts';
 
 class AuthService {
   static signIn(formData: FormData) {
@@ -19,8 +20,8 @@ class AuthService {
     return api.post('/register', values);
   }
 
-  static getUser() {
-    return api.get('/me');
+  static getUserProfile() {
+    return api.get<User>('/profile');
   }
 }
 

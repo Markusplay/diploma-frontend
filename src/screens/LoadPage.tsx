@@ -63,7 +63,9 @@ export function LoadPage() {
     <>
       <Card className="h-full">
         <CardHeader>
-          <CardTitle>Розподіл навантаження</CardTitle>
+          <CardTitle className="w-full justify-center text-center text-xl">
+            Розподіл навантаження
+          </CardTitle>
 
           <div className="flex justify-between">
             <Button
@@ -94,16 +96,21 @@ export function LoadPage() {
           <DataTable data={initialLoadData || []} columns={columns} loading={isLoading} />
         </CardContent>
         <CardFooter className="flex gap-5">
-          <Button className="gap-2 px-4" onClick={handleDownload} disabled={mutation.isPending}>
+          <Button
+            size="lg"
+            className="gap-2 px-4"
+            onClick={handleDownload}
+            disabled={mutation.isPending}
+          >
             {mutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Завантажується...
+                Формується...
               </>
             ) : (
               <>
                 <ArrowDown size={20} />
-                Завантажити навантаження
+                Сформувати навантаження
               </>
             )}
           </Button>

@@ -9,9 +9,9 @@ import {
 } from '../ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
-import type { K3ItemType, K3ItemTypeWithId } from '../../types/K3ItemType';
-import { PaymentForm, StudyType } from '../../types/enums';
-import { COURSES, type CourseType, SEMESTERS, type SemesterType } from '../../types/types';
+import type { K3ItemType, K3ItemTypeWithId } from '@/types/K3ItemType.ts';
+import { PaymentForm, StudyType } from '@/types/enums.ts';
+import { COURSES, type CourseType, SEMESTERS, type SemesterType } from '@/types/types.ts';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react';
 import { type FC, useEffect, useState } from 'react';
@@ -147,9 +147,9 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
       practicals: values.practicals,
       labs: values.labs,
       individualLessons: values.individualLessons,
-      exams: !!values.exams,
-      credits: !!values.credits,
-      controlWork: !!values.controlWork,
+      exams: values.exams,
+      credits: values.credits,
+      controlWork: values.controlWork,
       courseProject: values.courseProject,
       courseWork: values.courseWork,
       rgr: values.rgr,
@@ -754,6 +754,7 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
         <DialogFooter>
           <Button
             type="button"
+            size="lg"
             disabled={createMutation.isPending}
             onClick={form.handleSubmit(onSubmit)}
           >

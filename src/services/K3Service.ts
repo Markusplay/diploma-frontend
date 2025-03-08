@@ -6,6 +6,10 @@ class K3Service {
     return api.get<K3ItemTypeWithId[]>('/k3');
   }
 
+  static getById(id: string) {
+    return api.get<K3ItemTypeWithId[]>(`/k3/${id}`);
+  }
+
   static create(data: K3ItemType) {
     return api.post('/k3', data);
   }

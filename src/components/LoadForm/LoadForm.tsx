@@ -25,6 +25,12 @@ import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient.ts';
 import { QUERY_KEY } from '@/lib/constants.ts';
 import LoadService from '@/services/LoadService.ts';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion.tsx';
 
 interface LoadFormProps {
   isOpen: boolean;
@@ -146,7 +152,7 @@ const LoadForm: FC<LoadFormProps> = ({ isOpen, onOpenChange, loadItem }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="w-[50%]">
         <DialogHeader>
           <DialogTitle>Змінити навантаження</DialogTitle>
         </DialogHeader>
@@ -201,30 +207,37 @@ const LoadForm: FC<LoadFormProps> = ({ isOpen, onOpenChange, loadItem }) => {
                 )}
               />
 
-              <p>
-                Група:{' '}
-                {groups?.find(
-                  (group) => group.groupId.toString() === loadItem?.group?.groupId.toString(),
-                )?.groupName || 'Оберіть групу'}
-              </p>
+              <Accordion type="single" collapsible>
+                <AccordionItem value="item-1">
+                  <AccordionTrigger>Детальніше</AccordionTrigger>
+                  <AccordionContent>
+                    <p>
+                      Група:{' '}
+                      {groups?.find(
+                        (group) => group.groupId.toString() === loadItem?.group?.groupId.toString(),
+                      )?.groupName || 'Оберіть групу'}
+                    </p>
 
-              <p>Курс: {loadItem?.course}</p>
-              <p>Семестр: {loadItem?.semester}</p>
+                    <p>Курс:{loadItem?.course}</p>
+                    <p>Семестр: {loadItem?.semester}</p>
 
-              <p>Кількість студентів: {loadItem?.studentAmount}</p>
-              <p>Лекції: {loadItem?.lectureHour}</p>
-              <p>Практичні: {loadItem?.practiceHour}</p>
-              <p>Лабораторні: {loadItem?.labHour}</p>
+                    <p>Кількість студентів: {loadItem?.studentAmount}</p>
+                    <p>Лекції: {loadItem?.lectureHour}</p>
+                    <p>Практичні: {loadItem?.practiceHour}</p>
+                    <p>Лабораторні: {loadItem?.labHour}</p>
 
-              <p>Іспит: {loadItem?.examHour}</p>
-              <p>Заліки: {loadItem?.creditHour}</p>
-              <p>Курсові роботи: {loadItem?.courseWorkHour}</p>
-              <p>Курсові роботи: {loadItem?.courseProjectHour}</p>
+                    <p>Іспит: {loadItem?.examHour}</p>
+                    <p>Заліки: {loadItem?.creditHour}</p>
+                    <p>Курсові роботи: {loadItem?.courseWorkHour}</p>
+                    <p>Курсові роботи: {loadItem?.courseProjectHour}</p>
 
-              <p>РГР, РР, ГР: {loadItem?.rgrHour}</p>
-              <p>ДКР: {loadItem?.dkrHour}</p>
-              <p>Контрольні роботи: {loadItem?.controlWorkHour}</p>
-              <p>Консультації: {loadItem?.consultHour}</p>
+                    <p>РГР, РР, ГР: {loadItem?.rgrHour}</p>
+                    <p>ДКР: {loadItem?.dkrHour}</p>
+                    <p>Контрольні роботи: {loadItem?.controlWorkHour}</p>
+                    <p>Консультації: {loadItem?.consultHour}</p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
             <div className="flex flex-col gap-4">
               <FormField
@@ -309,7 +322,7 @@ const LoadForm: FC<LoadFormProps> = ({ isOpen, onOpenChange, loadItem }) => {
           </form>
         </Form>
         <DialogFooter>
-          <Button type="button" onClick={form.handleSubmit(onSubmit)}>
+          <Button type="button" size="lg" onClick={form.handleSubmit(onSubmit)}>
             Підтвердити
           </Button>
         </DialogFooter>

@@ -96,7 +96,7 @@ export function K3Page() {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>Форма К-3</CardTitle>
+        <CardTitle className="w-full justify-center text-center text-xl">Форма К-3</CardTitle>
         <div className="flex justify-between">
           <div className="flex gap-5">
             <Button className="gap-2 px-4" onClick={handleDownload} disabled={loading} size="lg">
