@@ -1,21 +1,9 @@
 import { api } from '../lib/api';
-import { K3ItemTypeWithId, K3ItemType } from '../types/K3ItemType';
+import { K3ItemTypeWithId } from '../types/k3-item.ts';
 
 class K3Service {
   static getAll() {
     return api.get<K3ItemTypeWithId[]>('/k3');
-  }
-
-  static getById(id: string) {
-    return api.get<K3ItemTypeWithId[]>(`/k3/${id}`);
-  }
-
-  static create(data: K3ItemType) {
-    return api.post('/k3', data);
-  }
-
-  static update(data: K3ItemTypeWithId) {
-    return api.put(`/k3`, data);
   }
 
   static delete(id: string) {

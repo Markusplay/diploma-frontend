@@ -8,8 +8,11 @@ import { Register } from './screens/Register';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
 import { queryClient } from './lib/queryClient';
 import { K3Page } from './screens/K3Page';
-import { LoadPage } from './screens/LoadPage';
+import { PlanPage } from './screens/PlanPage.tsx';
 import { Toaster } from './components/ui/toaster';
+import { HomePage } from '@/screens/HomePage/HomePage.tsx';
+import { CreationPage } from '@/screens/creation-page/CreationPage.tsx';
+import { K4Page } from '@/screens/K4Page.tsx';
 
 const router = createBrowserRouter([
   {
@@ -20,11 +23,27 @@ const router = createBrowserRouter([
         children: [
           {
             path: '/',
+            element: <HomePage />,
+          },
+          {
+            path: '/creation',
+            element: <CreationPage />,
+          },
+          {
+            path: '/k2',
             element: <K3Page />,
           },
           {
-            path: '/load',
-            element: <LoadPage />,
+            path: '/k3',
+            element: <K3Page />,
+          },
+          {
+            path: '/k3',
+            element: <K4Page />,
+          },
+          {
+            path: '/plan',
+            element: <PlanPage />,
           },
         ],
       },

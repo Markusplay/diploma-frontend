@@ -1,7 +1,7 @@
 import type { PaymentForm } from './enums';
 import type { CourseType } from './types';
 
-export type GroupType = {
+export type Group = {
   groupId: number;
   course: CourseType;
   groupName: string;

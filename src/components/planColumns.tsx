@@ -1,17 +1,17 @@
 import { Button } from './ui/button';
-import type { GroupType } from '../types/GroupType';
-import type { LoadType } from '../types/LoadType';
-import type { SubjectType } from '../types/SubjectType';
-import type { Teacher } from '../types/Teacher.ts';
+import type { Group } from '../types/group.ts';
+import type { PlanItem } from '../types/plan-item.ts';
+import type { Subject } from '../types/subject.ts';
+import type { Teacher } from '../types/teacher.ts';
 import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import DataTableRowActions from './DateTable/DataTableRowActions.tsx';
 
-interface LoadItemsColumnsProps {
-  onEdit: (loadItem: LoadType) => void;
-  onDelete?: (loadItem: LoadType) => void;
-  groupsData?: GroupType[];
-  subjectsData?: SubjectType[];
+interface Props {
+  onEdit: (loadItem: PlanItem) => void;
+  onDelete?: (loadItem: PlanItem) => void;
+  groupsData?: Group[];
+  subjectsData?: Subject[];
   teachersData?: Teacher[];
 }
 
@@ -20,7 +20,7 @@ export const getLoadColumns = ({
   groupsData,
   subjectsData,
   teachersData,
-}: LoadItemsColumnsProps): ColumnDef<LoadType>[] => [
+}: Props): ColumnDef<PlanItem>[] => [
   {
     accessorKey: 'paymentForm',
     header: 'Форма оплати',

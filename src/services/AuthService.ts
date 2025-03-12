@@ -1,6 +1,6 @@
 import { RegisterRequestBody } from '@/types/RegisterRequestBody';
 import { api } from '../lib/api';
-import { Token } from '@/types/Token.ts';
+import { Token } from '@/types/token.ts';
 import { User } from '@/types/user.ts';
 
 class AuthService {

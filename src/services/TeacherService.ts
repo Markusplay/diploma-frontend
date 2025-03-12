@@ -1,5 +1,5 @@
 import { api } from '../lib/api';
-import { Teacher } from '../types/Teacher';
+import { Teacher } from '../types/teacher.ts';
 
 class TeacherService {
   static getAll() {

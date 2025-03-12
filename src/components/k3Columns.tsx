@@ -1,15 +1,15 @@
-import type { GroupType } from '../types/GroupType';
-import type { K3ItemTypeWithId } from '../types/K3ItemType';
-import type { SubjectType } from '../types/SubjectType';
+import type { Group } from '../types/group.ts';
+import type { K3ItemTypeWithId } from '../types/k3-item.ts';
+import type { Subject } from '../types/subject.ts';
 import type { ColumnDef } from '@tanstack/react-table';
 import DataTableRowActions from './DateTable/DataTableRowActions.tsx';
 
-interface K3ColumnsProps {
+interface Props {
   onEdit: (k3Item: K3ItemTypeWithId) => void;
   onDelete: (k3Item: K3ItemTypeWithId) => void;
 
-  groupsData?: GroupType[];
-  subjectsData?: SubjectType[];
+  groupsData?: Group[];
+  subjectsData?: Subject[];
 }
 
 export const getK3Columns = ({
@@ -17,7 +17,7 @@ export const getK3Columns = ({
   onDelete,
   groupsData,
   subjectsData,
-}: K3ColumnsProps): ColumnDef<K3ItemTypeWithId>[] => [
+}: Props): ColumnDef<K3ItemTypeWithId>[] => [
   {
     accessorKey: 'paymentForm',
     header: 'Форма оплати',
@@ -32,14 +32,16 @@ export const getK3Columns = ({
     accessorKey: 'subjectId',
     header: 'Дисципліна',
     cell: ({ row }) =>
-      subjectsData?.find((subject) => subject.subjectId.toString() === row.original.subjectId.toString())
-        ?.fullName,
+      subjectsData?.find(
+        (subject) => subject.subjectId.toString() === row.original.subjectId.toString(),
+      )?.fullName,
   },
   {
     accessorKey: 'groupId',
     header: 'Група',
     cell: ({ row }) =>
-      groupsData?.find((group) => group.groupId.toString() === row.original.groupId.toString())?.groupName,
+      groupsData?.find((group) => group.groupId.toString() === row.original.groupId.toString())
+        ?.groupName,
   },
   {
     accessorKey: 'semester',
@@ -79,17 +81,17 @@ export const getK3Columns = ({
   {
     accessorKey: 'exams',
     header: 'Екзамени',
-    cell: ({ row }) => <p>{row.original.exams ? '✅' : '❌'}</p>,
+    cell: ({ row }) => <p>{row.original.hasExam ? '✅' : '❌'}</p>,
   },
   {
     accessorKey: 'credits',
     header: 'Заліки',
-    cell: ({ row }) => <p>{row.original.credits ? '✅' : '❌'}</p>,
+    cell: ({ row }) => <p>{row.original.hasCredit ? '✅' : '❌'}</p>,
   },
   {
     accessorKey: 'controlWork',
     header: 'Контр.роботи',
-    cell: ({ row }) => <p>{row.original.controlWork ? '✅' : '❌'}</p>,
+    cell: ({ row }) => <p>{row.original.hasControlWork ? '✅' : '❌'}</p>,
   },
   {
     accessorKey: 'courseProject',

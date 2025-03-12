@@ -1,20 +1,20 @@
-import type { GroupType } from './GroupType';
-import type { ManagementType } from './ManagementType';
-import type { SubjectType } from './SubjectType';
-import type { Teacher } from './Teacher';
+import type { Group } from './group.ts';
+import type { Management } from './management.ts';
+import type { Subject } from './subject.ts';
+import type { Teacher } from './teacher.ts';
 import type { PaymentForm, StudyType } from './enums';
 import type { CourseType, SemesterType } from './types';
 
-export type LoadType = {
+export type PlanItem = {
   id: string;
   paymentForm: PaymentForm; // форма оплати
   studyType: StudyType; // вид навчання
-  subject?: SubjectType;
+  subject?: Subject;
   cathedra: string; // кафедра
   course: CourseType; // курс
   semester: SemesterType; // семестр
   teacher?: Teacher; // викладач
-  group?: GroupType; // група
+  group?: Group; // група
 
   studentAmount: number; // кількість студентів
   lectureHour: number; // години лекцій
@@ -32,7 +32,7 @@ export type LoadType = {
   // abstractHour: number; // години рефератів
   // diplomaPracticalHour: number; // години практичних дипломів
 
-  management: ManagementType; // управління
+  management: Management; // управління
 
   DEKHour: number; // години ДЕК
   totalHour: number; // загальна кількість годин

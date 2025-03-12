@@ -1,23 +1,12 @@
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button.tsx';
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '../ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
-import { Input } from '../ui/input';
-import type { K3ItemType, K3ItemTypeWithId } from '@/types/K3ItemType.ts';
-import { PaymentForm, StudyType } from '@/types/enums.ts';
-import { COURSES, type CourseType, SEMESTERS, type SemesterType } from '@/types/types.ts';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react';
-import { type FC, useEffect, useState } from 'react';
-import { type SubmitHandler, useForm } from 'react-hook-form';
-import type { z } from 'zod';
-import { Checkbox } from '../ui/checkbox';
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form.tsx';
 import {
   Command,
   CommandEmpty,
@@ -25,8 +14,21 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '../ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+} from '@/components/ui/command.tsx';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { formSchema } from './schema.ts';
+import { FC, useEffect, useState } from 'react';
+import { queryClient } from '@/lib/queryClient.ts';
+import { z } from 'zod';
+import { QUERY_KEY } from '@/lib/constants.ts';
+import { useMutation } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast.ts';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { COURSES, CourseType, SEMESTERS, SemesterType } from '@/types/types.ts';
+import { Checkbox } from '@/components/ui/checkbox.tsx';
 import {
   Select,
   SelectContent,
@@ -34,40 +36,39 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select';
-import formSchema from './schema';
-import { cn } from '@/lib/cn.ts';
-import { queryClient } from '@/lib/queryClient';
-import { QUERY_KEY } from '@/lib/constants';
-import { useMutation } from '@tanstack/react-query';
-import K3Service from '@/services/K3Service';
-import { useToast } from '@/hooks/use-toast';
-import { SubjectType } from '@/types/SubjectType';
-import { GroupType } from '@/types/GroupType';
+} from '@/components/ui/select.tsx';
+import { cn } from '@/lib/utils.ts';
+import { PaymentForm, StudyType } from '@/types/enums.ts';
+import { useGroups } from '@/hooks/use-groups.ts';
+import { useSubjects } from '@/hooks/use-subjects.ts';
+import { BackButton } from '@/components/BackButton.tsx';
+import { Link } from 'react-router-dom';
+import { Workload } from '@/types/workload.ts';
+import WorkloadService from '@/services/WorkloadService.ts';
+import { useTeachers } from '@/hooks/use-teachers.ts';
 
-interface K3FormProps {
-  isOpen: boolean;
-  onOpenChange: (value: boolean) => void;
-  k3Item: K3ItemTypeWithId | null;
-  groups: GroupType[];
-  subjects: SubjectType[];
-}
-
-const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subjects }) => {
+export const CreationPage: FC = () => {
   const { toast } = useToast();
+  const { data: groups } = useGroups();
+  const { data: subjects } = useSubjects();
+  const { data: teachers } = useTeachers();
 
   const [openSubjectSearch, setOpenSubjectSearch] = useState(false);
   const [openGroupSearch, setOpenGroupSearch] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    mode: 'onChange',
+    mode: 'onSubmit',
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: K3ItemType) => K3Service.create(data),
+    mutationFn: (data: Workload) => WorkloadService.post(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY.K3] });
+      toast({
+        title: 'Дані успішно додано',
+        variant: 'success',
+      });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY.WORKLOAD] });
     },
     onError: () => {
       toast({
@@ -77,122 +78,38 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
     },
   });
 
-  const updateMutation = useMutation({
-    mutationFn: (data: K3ItemTypeWithId) => K3Service.update(data),
-    onSuccess: () => {
-      toast({
-        title: 'Дані успішно оновлено',
-        variant: 'success',
-      });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY.K3] });
-    },
-    onError: () => {
-      toast({
-        title: 'Помилка під час оновлення',
-        variant: 'destructive',
-      });
-    },
-  });
-
   useEffect(() => {
-    if (k3Item) {
-      form.reset({
-        semester: k3Item.semester,
-        course: k3Item.course,
-        subjectId: k3Item.subjectId.toString(),
-        groupId: k3Item.groupId.toString(),
-        disciplineVolume: k3Item.disciplineVolume,
-        lectures: k3Item.lectures,
-        practicals: k3Item.practicals,
-        labs: k3Item.labs,
-        individualLessons: k3Item.individualLessons,
-        exams: k3Item.exams,
-        credits: k3Item.credits,
-        controlWork: k3Item.controlWork,
-        courseProject: k3Item.courseProject,
-        courseWork: k3Item.courseWork,
-        rgr: k3Item.rgr,
-        dkr: k3Item.dkr,
-        abstract: k3Item.abstract,
-        academicBudget: k3Item.academicBudget,
-        paymentForm: k3Item.paymentForm,
-        studyType: k3Item.studyType,
-        subgroupsForPZ: k3Item.subgroupsForPZ,
-        subgroupsForLabs: k3Item.subgroupsForLabs,
-        academicContract: k3Item.academicContract,
-        bValue: k3Item.bValue,
-        kValue: k3Item.kValue,
-        bkValue: k3Item.bkValue,
-        kkValue: k3Item.kkValue,
-        streamsAmount: k3Item.streamsAmount,
-      });
-    } else {
-      form.reset();
-    }
-  }, [isOpen, k3Item]);
+    form.reset();
+  }, [form]);
 
-  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (
-    values: z.infer<typeof formSchema>,
-  ) => {
-    const k3Dto: K3ItemType = {
-      groupId: values.groupId,
+  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {
+    console.log('clicked');
+    const dto: Workload = {
+      ...values,
+      subjectId: parseInt(values.subjectId),
+      groupId: parseInt(values.groupId),
+      teacherId: 23,
+      cathedra: 'ІСТ',
+      paymentForm: values.paymentForm as PaymentForm,
       semester: values.semester as SemesterType,
       course: values.course as CourseType,
-      paymentForm: values.paymentForm,
-      subjectId: values.subjectId || '',
-      cathedra: 'ІСТ',
-      studyType: values.studyType,
-      disciplineVolume: values.disciplineVolume,
-      lectures: values.lectures,
-      practicals: values.practicals,
-      labs: values.labs,
-      individualLessons: values.individualLessons,
-      exams: values.exams,
-      credits: values.credits,
-      controlWork: values.controlWork,
-      courseProject: values.courseProject,
-      courseWork: values.courseWork,
-      rgr: values.rgr,
-      dkr: values.dkr,
-      abstract: values.abstract,
-      academicBudget: values.academicBudget,
-      subgroupsForPZ: values.subgroupsForPZ,
-      subgroupsForLabs: values.subgroupsForLabs,
-      academicContract: values.academicContract,
-      bValue: values.bValue,
-      kValue: values.kValue,
-      bkValue: values.bkValue,
-      kkValue: values.kkValue,
-      streamsAmount: values.streamsAmount,
     };
 
-    if (!k3Item) {
-      createMutation.mutate(k3Dto);
-    } else {
-      const body: K3ItemTypeWithId = Object.assign(k3Dto, { id: k3Item.id });
-      updateMutation.mutate(body);
-    }
-
-    onOpenChange(false);
+    createMutation.mutate(dto);
   };
-
-  console.log('k3Item', k3Item);
-
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button className="gap-2 px-4" size="lg">
-          <Plus /> Додати К-3 дисципліну
-        </Button>
-      </DialogTrigger>
+    <div className="container mx-auto p-6">
+      <div className="flex">
+        <BackButton />
+        <h1 className="text-2xl font-bold mx-auto">Додати нову дисципліну</h1>
+      </div>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{k3Item ? 'Оновити дисципліну' : 'Додати нову дисципліну'}</DialogTitle>
-        </DialogHeader>
-        <Form {...form}>
-          <form className="flex gap-10 items-start">
-            <div className="flex flex-col gap-4">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-8">
+          {/* Основна інформація */}
+          <section>
+            <h2 className="text-xl font-semibold mb-2">Основна інформація</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-end">
               <FormField
                 name="subjectId"
                 control={form.control}
@@ -206,39 +123,37 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                             variant="outline"
                             role="combobox"
                             aria-expanded={openSubjectSearch}
-                            className="w-[200px] justify-between"
+                            className="w-full justify-between"
                           >
                             {subjects?.find((subject) => subject.subjectId.toString() === value)
                               ?.fullName || 'Знайти дисципліну'}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[200px] p-0">
+                        <PopoverContent className="w-full p-0 max-w-[500px]">
                           <Command>
                             <CommandInput placeholder="Пошук дисципліни..." />
                             <CommandList>
                               <CommandEmpty>Дисципліну не знайдено.</CommandEmpty>
                               <CommandGroup>
-                                {subjects?.map((subject) => {
-                                  return (
-                                    <CommandItem
-                                      key={subject.subjectId}
-                                      value={subject.subjectId.toString()}
-                                      onSelect={(currentValue) => {
-                                        onChange(currentValue === value ? '' : currentValue);
-                                        setOpenSubjectSearch(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          'mr-2 h-4 w-4',
-                                          value === subject.fullName ? 'opacity-100' : 'opacity-0',
-                                        )}
-                                      />
-                                      {subject.fullName}
-                                    </CommandItem>
-                                  );
-                                })}
+                                {subjects?.map((subject) => (
+                                  <CommandItem
+                                    key={subject.subjectId}
+                                    value={subject.subjectId.toString()}
+                                    onSelect={(currentValue) => {
+                                      onChange(currentValue === value ? '' : currentValue);
+                                      setOpenSubjectSearch(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        'mr-2 h-4 w-4',
+                                        value === subject.fullName ? 'opacity-100' : 'opacity-0',
+                                      )}
+                                    />
+                                    {subject.fullName}
+                                  </CommandItem>
+                                ))}
                               </CommandGroup>
                             </CommandList>
                           </Command>
@@ -252,19 +167,17 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
               <FormField
                 name="paymentForm"
                 control={form.control}
-                render={({ field: { onChange } }) => (
+                render={({ field: { onChange, value } }) => (
                   <FormItem>
                     <FormLabel>Форма оплати</FormLabel>
                     <FormControl>
-                      <Select onValueChange={(value) => onChange(value)}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue
-                            placeholder={k3Item?.paymentForm || 'Оберіть форму оплати'}
-                          />
+                      <Select onValueChange={onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={value || 'Оберіть форму оплати'} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {Object.values(PaymentForm)?.map((item) => (
+                            {Object.values(PaymentForm).map((item) => (
                               <SelectItem key={item} value={item}>
                                 {item}
                               </SelectItem>
@@ -277,21 +190,20 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                   </FormItem>
                 )}
               />
-
               <FormField
                 name="studyType"
                 control={form.control}
-                render={({ field: { onChange } }) => (
+                render={({ field: { onChange, value } }) => (
                   <FormItem>
                     <FormLabel>Форма навчання</FormLabel>
                     <FormControl>
-                      <Select onValueChange={(value) => onChange(value)}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder={k3Item?.studyType || 'Оберіть форму'} />
+                      <Select onValueChange={onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={value || 'Оберіть форму навчання'} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {Object.values(StudyType)?.map((item) => (
+                            {Object.values(StudyType).map((item) => (
                               <SelectItem key={item} value={item}>
                                 {item}
                               </SelectItem>
@@ -308,36 +220,6 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 name="groupId"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
-                  // <FormItem>
-                  //   <FormLabel>Група</FormLabel>
-                  //   <FormControl>
-                  //     <Select onValueChange={value => onChange(value)}>
-                  //       <SelectTrigger className="w-[180px]">
-                  //         <SelectValue
-                  //           placeholder={
-                  //             groups?.find(
-                  //               group =>
-                  //                 group.groupId.toString() === k3Item?.groupId,
-                  //             )?.groupName || 'Оберіть групу'
-                  //           }
-                  //         />
-                  //       </SelectTrigger>
-                  //       <SelectContent>
-                  //         <SelectGroup>
-                  //           {groups?.map(item => (
-                  //             <SelectItem
-                  //               key={item.groupId}
-                  //               value={item.groupId.toString()}
-                  //             >
-                  //               {item.groupName}
-                  //             </SelectItem>
-                  //           ))}
-                  //         </SelectGroup>
-                  //       </SelectContent>
-                  //     </Select>
-                  //   </FormControl>
-                  //   <FormMessage />
-                  // </FormItem>
                   <FormItem className="flex flex-col overflow-hidden">
                     <FormLabel>Група</FormLabel>
                     <FormControl>
@@ -347,39 +229,37 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                             variant="outline"
                             role="combobox"
                             aria-expanded={openGroupSearch}
-                            className="w-[200px] justify-between"
+                            className="w-full justify-between"
                           >
                             {groups?.find((group) => group.groupId.toString() === value)
                               ?.groupName || 'Оберіть групу'}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[200px] p-0">
+                        <PopoverContent className="w-full p-0 max-w-[500px]">
                           <Command>
                             <CommandInput placeholder="Пошук групи..." />
                             <CommandList>
                               <CommandEmpty>Групу не знайдено.</CommandEmpty>
                               <CommandGroup>
-                                {groups?.map((group) => {
-                                  return (
-                                    <CommandItem
-                                      key={group.groupId}
-                                      value={group.groupId.toString()}
-                                      onSelect={(currentValue) => {
-                                        onChange(currentValue === value ? '' : currentValue);
-                                        setOpenSubjectSearch(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          'mr-2 h-4 w-4',
-                                          value === group.groupName ? 'opacity-100' : 'opacity-0',
-                                        )}
-                                      />
-                                      {group.groupName}
-                                    </CommandItem>
-                                  );
-                                })}
+                                {groups?.map((group) => (
+                                  <CommandItem
+                                    key={group.groupId}
+                                    value={group.groupId.toString()}
+                                    onSelect={(currentValue) => {
+                                      onChange(currentValue === value ? '' : currentValue);
+                                      setOpenGroupSearch(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        'mr-2 h-4 w-4',
+                                        value === group.groupName ? 'opacity-100' : 'opacity-0',
+                                      )}
+                                    />
+                                    {group.groupName}
+                                  </CommandItem>
+                                ))}
                               </CommandGroup>
                             </CommandList>
                           </Command>
@@ -393,13 +273,13 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
               <FormField
                 name="semester"
                 control={form.control}
-                render={({ field: { onChange } }) => (
+                render={({ field: { onChange, value } }) => (
                   <FormItem>
                     <FormLabel>Семестр</FormLabel>
                     <FormControl>
-                      <Select onValueChange={(value) => onChange(value)}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder={k3Item?.semester || 'Оберіть семестр'} />
+                      <Select onValueChange={onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={value || 'Оберіть семестр'} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
@@ -419,13 +299,13 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
               <FormField
                 name="course"
                 control={form.control}
-                render={({ field: { onChange } }) => (
+                render={({ field: { onChange, value } }) => (
                   <FormItem>
                     <FormLabel>Курс</FormLabel>
                     <FormControl>
-                      <Select onValueChange={(value) => onChange(value)}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder={k3Item?.course || 'Оберіть курс'} />
+                      <Select onValueChange={onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={value || 'Оберіть курс'} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
@@ -455,10 +335,48 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="flex flex-col gap-4">
               <FormField
-                name="lectures"
+                name="teacherId"
+                control={form.control}
+                render={({ field: { value, onChange } }) => (
+                  <FormItem>
+                    <FormLabel>Викладач</FormLabel>
+                    <FormControl>
+                      <Select onValueChange={(value) => onChange(value)}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue
+                            placeholder={
+                              teachers?.find((teacher) => teacher.teacherId.toString() === value)
+                                ?.initials || 'Оберіть викладача'
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {teachers?.map((teacher) => (
+                              <SelectItem
+                                key={teacher.teacherId}
+                                value={teacher.teacherId.toString()}
+                              >
+                                {`${teacher.secondName} ${teacher.firstName} ${teacher.middleName}`}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </section>
+          {/* Заняття */}
+          <section>
+            <h2 className="text-xl font-semibold mb-2">Заняття</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <FormField
+                name="lectureHour"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
                   <FormItem>
@@ -471,7 +389,7 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
               <FormField
-                name="practicals"
+                name="practiceHour"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
                   <FormItem>
@@ -484,7 +402,7 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
               <FormField
-                name="labs"
+                name="labHour"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
                   <FormItem>
@@ -510,16 +428,14 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
               <FormField
-                name="exams"
+                name="hasExam"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <FormControl>
                       <div className="flex items-center space-x-2">
                         <Checkbox checked={value} onCheckedChange={onChange} />
-                        <div className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                          Екзамени
-                        </div>
+                        <div className="text-sm font-medium">Екзамени</div>
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -527,16 +443,14 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
               <FormField
-                name="credits"
+                name="hasCredit"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <FormControl>
                       <div className="flex items-center space-x-2">
                         <Checkbox checked={value} onCheckedChange={onChange} />
-                        <div className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                          Заліки
-                        </div>
+                        <div className="text-sm font-medium">Заліки</div>
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -544,16 +458,14 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
               <FormField
-                name="controlWork"
+                name="hasControlWork"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <FormControl>
                       <div className="flex items-center space-x-2">
                         <Checkbox checked={value} onCheckedChange={onChange} />
-                        <div className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                          Контр.роб (мод., темат.)
-                        </div>
+                        <div className="text-sm font-medium">Контр.роб (мод., темат.)</div>
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -561,9 +473,13 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
             </div>
-            <div className="flex flex-col gap-4">
+          </section>
+          {/* Проєкти та реферати */}
+          <section>
+            <h2 className="text-xl font-semibold mb-2">Проєкти та реферати</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <FormField
-                name="courseProject"
+                name="courseProjectHour"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
                   <FormItem>
@@ -576,7 +492,7 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
               <FormField
-                name="courseWork"
+                name="courseWorkHour"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
                   <FormItem>
@@ -589,7 +505,7 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
               <FormField
-                name="rgr"
+                name="rgrHour"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
                   <FormItem>
@@ -602,7 +518,7 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
               <FormField
-                name="dkr"
+                name="dkrHour"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
                   <FormItem>
@@ -628,13 +544,17 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
             </div>
-            <div className="flex flex-col gap-4">
+          </section>
+          {/* Підгрупи та бюджет */}
+          <section>
+            <h2 className="text-xl font-semibold mb-2">Підгрупи та бюджет</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <FormField
                 name="subgroupsForPZ"
                 control={form.control}
                 render={({ field: { value, onChange } }) => (
                   <FormItem>
-                    <FormLabel>Підгрупи для ПЗ</FormLabel>
+                    <FormLabel>Підгрупи для практичних занять</FormLabel>
                     <FormControl>
                       <Input value={value} onChange={(value) => onChange(value)} />
                     </FormControl>
@@ -682,7 +602,95 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
             </div>
-            <div className="flex flex-col gap-4">
+          </section>
+          {/* Керівництво */}
+          <section>
+            <h2 className="text-xl font-semibold mb-2">Керівництво</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <FormField
+                name="managementPractice"
+                control={form.control}
+                render={({ field: { value, onChange } }) => (
+                  <FormItem>
+                    <FormLabel>Керівництво практикою</FormLabel>
+                    <FormControl>
+                      <Input value={value} onChange={(value) => onChange(value)} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="managementBachelor"
+                control={form.control}
+                render={({ field: { value, onChange } }) => (
+                  <FormItem>
+                    <FormLabel>Керівництво бакалаврами</FormLabel>
+                    <FormControl>
+                      <Input value={value} onChange={(value) => onChange(value)} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="managementMasterPractice"
+                control={form.control}
+                render={({ field: { value, onChange } }) => (
+                  <FormItem>
+                    <FormLabel>Керівництво магістрами професійними</FormLabel>
+                    <FormControl>
+                      <Input value={value} onChange={(value) => onChange(value)} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="managementMasterScience"
+                control={form.control}
+                render={({ field: { value, onChange } }) => (
+                  <FormItem>
+                    <FormLabel>Керівництво науковцями</FormLabel>
+                    <FormControl>
+                      <Input value={value} onChange={(value) => onChange(value)} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="managementPostgraduate"
+                control={form.control}
+                render={({ field: { value, onChange } }) => (
+                  <FormItem>
+                    <FormLabel>Керівництво аспірантами</FormLabel>
+                    <FormControl>
+                      <Input value={value} onChange={(value) => onChange(value)} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="dekHour"
+                control={form.control}
+                render={({ field: { value, onChange } }) => (
+                  <FormItem>
+                    <FormLabel>ДЕК</FormLabel>
+                    <FormControl>
+                      <Input value={value} onChange={(value) => onChange(value)} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </section>
+          {/* Інші параметри */}
+          <section>
+            <h2 className="text-xl font-semibold mb-2">Інші параметри</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <FormField
                 name="bValue"
                 control={form.control}
@@ -749,22 +757,20 @@ const K3Form: FC<K3FormProps> = ({ isOpen, onOpenChange, k3Item, groups, subject
                 )}
               />
             </div>
-          </form>
-        </Form>
-        <DialogFooter>
-          <Button
-            type="button"
-            size="lg"
-            disabled={createMutation.isPending}
-            onClick={form.handleSubmit(onSubmit)}
-          >
-            {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Підтвердити
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </section>
+          <div className="flex gap-4 justify-end">
+            {createMutation.isSuccess && (
+              <Button variant="outline" size="lg" type="button" asChild>
+                <Link to="/k3">Переглянути форму К-3</Link>
+              </Button>
+            )}
+            <Button type="submit" size="lg" disabled={createMutation.isPending}>
+              {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Підтвердити
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 };
-
-export default K3Form;

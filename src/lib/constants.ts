@@ -1,7 +1,7 @@
 export enum QUERY_KEY {
   USER = 'user',
   K3 = 'k3',
-  LOADS = 'loads',
+  WORKLOAD = 'workload',
   GROUPS = 'groups',
   SUBJECTS = 'subjects',
   TEACHERS = 'teachers',

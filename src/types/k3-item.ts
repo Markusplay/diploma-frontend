@@ -1,7 +1,7 @@
 import type { PaymentForm, StudyType } from './enums';
 import type { CourseType, SemesterType } from './types';
 
-export type K3ItemType = {
+export type K3Item = {
   paymentForm: PaymentForm;
   subjectId: string;
   cathedra: string;
@@ -14,9 +14,9 @@ export type K3ItemType = {
   practicals: number;
   labs: number;
   individualLessons: number;
-  exams: boolean;
-  credits: boolean;
-  controlWork: boolean;
+  hasExam: boolean;
+  hasCredit: boolean;
+  hasControlWork: boolean;
   courseProject: number;
   courseWork: number;
   rgr: number;
@@ -33,4 +33,4 @@ export type K3ItemType = {
   streamsAmount: number;
 };
 
-export type K3ItemTypeWithId = K3ItemType & { id: string };
+export type K3ItemTypeWithId = K3Item & { id: string };

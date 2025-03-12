@@ -1,9 +1,9 @@
 import { api } from '../lib/api';
-import { GroupType } from '../types/GroupType';
+import { Group } from '../types/group.ts';
 
 class GroupService {
   static getAll() {
-    return api.get<GroupType[]>('/groups');
+    return api.get<Group[]>('/groups');
   }
 }
 export default GroupService;

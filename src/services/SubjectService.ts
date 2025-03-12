@@ -1,9 +1,9 @@
 import { api } from '../lib/api';
-import { SubjectType } from '../types/SubjectType';
+import { Subject } from '../types/subject.ts';
 
 class SubjectService {
   static getAll() {
-    return api.get<SubjectType[]>('/subjects');
+    return api.get<Subject[]>('/subjects');
   }
 }
 export default SubjectService;

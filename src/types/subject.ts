@@ -1,4 +1,4 @@
-export type SubjectType = {
+export type Subject = {
   subjectId: number;
   shortName: string;
   fullName: string;

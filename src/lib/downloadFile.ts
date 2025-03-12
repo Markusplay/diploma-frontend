@@ -1,14 +1,15 @@
 import { baseURL } from './api.ts';
 import { getToken } from './localStorageUtils.ts';
 
-const FileVariant = {
-  k3: '/k3',
-  load: '/load',
-};
+export enum FileVariant {
+  K3B = '/k3b',
+  K3K = '/k3k',
+  PLAN = '/plan',
+}
 
-export const downloadFile = async (variant: keyof typeof FileVariant, filename: string) => {
+export const downloadFile = async (variant: FileVariant, filename: string) => {
   try {
-    const response = await fetch(`${baseURL}download${FileVariant[variant]}`, {
+    const response = await fetch(`${baseURL}download${variant}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
