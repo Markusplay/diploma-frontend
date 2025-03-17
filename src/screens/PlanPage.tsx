@@ -1,7 +1,6 @@
 import { getLoadColumns } from '../components/planColumns.tsx';
-import type { PlanItem } from '../types/plan-item.ts';
 import { ArrowDown, Loader2 } from 'lucide-react';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import DataTable from '../components/DateTable/DateTable';
 import { Button } from '../components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/card';
@@ -12,6 +11,7 @@ import PlanService from '../services/PlanService.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { QUERY_KEY } from '../lib/constants';
 import { BackButton } from '@/components/BackButton.tsx';
+import WorkloadService from '@/services/WorkloadService.ts';
 
 export function PlanPage() {
   const { data: groups } = useGroups();
@@ -26,14 +26,17 @@ export function PlanPage() {
     },
   });
 
-  const onEdit = useCallback((p: PlanItem) => {
-    console.log(p.id);
-  }, []);
+  const { data: analyzeData, isLoading: isAnalyzing } = useQuery({
+    queryKey: [QUERY_KEY.ANALYZE],
+    queryFn: async () => {
+      const { data } = await WorkloadService.analyze();
+      return data;
+    },
+  });
 
   const columns = useMemo(
     () =>
       getLoadColumns({
-        onEdit,
         groupsData: groups,
         subjectsData: subjects,
         teachersData: teachers,
@@ -63,6 +66,17 @@ export function PlanPage() {
         </CardHeader>
         <CardContent>
           <DataTable data={initialLoadData || []} columns={columns} loading={isLoading} />
+          {isAnalyzing && (
+            <div className="flex mt-5">
+              <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+              Відбувається аналіз
+            </div>
+          )}
+          <ul className="mt-4">
+            <li>Викладачі, які мають перевантаження: {analyzeData?.overloaded_teachers.length}</li>
+            {!analyzeData?.is_balanced &&
+              analyzeData?.overloaded_teachers.map((ot) => <li className="text-red-600">{ot}</li>)}
+          </ul>
         </CardContent>
         <CardFooter className="flex gap-5">
           <Button

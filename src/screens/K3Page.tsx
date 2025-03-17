@@ -16,6 +16,7 @@ import { queryClient } from '../lib/queryClient';
 import { QUERY_KEY } from '../lib/constants';
 import { Link } from 'react-router-dom';
 import { BackButton } from '@/components/BackButton.tsx';
+import WorkloadService from '@/services/WorkloadService.ts';
 
 const K3B_FILENAME = 'К-3-Б.xlsx';
 const K3K_FILENAME = 'К-3-K.xlsx';
@@ -47,7 +48,7 @@ export function K3Page() {
   }, []);
 
   const deleteMutation = useMutation({
-    mutationFn: (k3ItemId: string) => K3Service.delete(k3ItemId),
+    mutationFn: (id: string) => WorkloadService.delete(id),
     onSuccess: () => {
       toast({
         title: 'Дані успішно видалені',

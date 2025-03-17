@@ -8,6 +8,7 @@ export const BackButton: FC = () => {
   return (
     <Button
       className="w-fit"
+      variant="outline"
       onClick={() => {
         navigate('/');
       }}

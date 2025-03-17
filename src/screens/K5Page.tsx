@@ -13,9 +13,9 @@ import { BackButton } from '@/components/BackButton.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { ArrowDown, Loader2 } from 'lucide-react';
 
-const K4_FILENAME = 'K4.xlsx';
+const K5_FILENAME = 'K5.xlsx';
 
-export const K4Page = () => {
+export const K5Page = () => {
   const { data: groups } = useGroups();
   const { data: subjects } = useSubjects();
   const { data: teachers } = useTeachers();
@@ -54,7 +54,7 @@ export const K4Page = () => {
       <DataTable data={initialLoadData || []} columns={columns} loading={isLoading} />
       <Button
         className="gap-2 px-4"
-        onClick={() => handleDownloadK4(FileVariant.K4, K4_FILENAME)}
+        onClick={() => handleDownloadK4(FileVariant.K4, K5_FILENAME)}
         size="lg"
         disabled={loading || initialLoadData?.length === 0}
       >

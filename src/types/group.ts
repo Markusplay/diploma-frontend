@@ -10,3 +10,5 @@ export type Group = {
   contractPlaces: number;
   foreignPlaces: number;
 };
+
+export type GroupWithId = Group & { groupId: number };

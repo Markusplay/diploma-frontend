@@ -7,8 +7,12 @@ class PlanService {
     return api.get<PlanItem[]>('/plan');
   }
 
-  static download() {
-    return downloadFile(FileVariant.PLAN, 'Report.pdf');
+  static getByTeacherId(teacherId: string) {
+    return api.get<PlanItem[]>(`/plan/${teacherId}`);
+  }
+
+  static download(teacherId?: string) {
+    return downloadFile(FileVariant.PLAN, 'Report.pdf', teacherId);
   }
 }
 

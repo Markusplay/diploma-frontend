@@ -20,7 +20,7 @@ export default function ProtectedRoute() {
           <User />
           {user?.username}
         </div>
-        <Button variant="outline" onClick={handleLogout}>
+        <Button variant="destructive" onClick={handleLogout}>
           Вийти
         </Button>
       </div>
