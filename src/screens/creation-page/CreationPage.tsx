@@ -80,15 +80,14 @@ export const CreationPage: FC = () => {
 
   useEffect(() => {
     form.reset();
-  }, [form]);
+  }, []);
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {
-    console.log('clicked');
     const dto: Workload = {
       ...values,
       subjectId: parseInt(values.subjectId),
       groupId: parseInt(values.groupId),
-      teacherId: 23,
+      teacherId: parseInt(values.teacherId),
       cathedra: 'ІСТ',
       paymentForm: values.paymentForm as PaymentForm,
       semester: values.semester as SemesterType,
@@ -97,6 +96,7 @@ export const CreationPage: FC = () => {
 
     createMutation.mutate(dto);
   };
+  console.log(form.formState);
   return (
     <div className="container mx-auto p-6">
       <div className="flex">
@@ -231,7 +231,7 @@ export const CreationPage: FC = () => {
                             aria-expanded={openGroupSearch}
                             className="w-full justify-between"
                           >
-                            {groups?.find((group) => group.groupId.toString() === value)
+                            {groups?.find((group) => group.groupId.toString() == value)
                               ?.groupName || 'Оберіть групу'}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
@@ -343,10 +343,10 @@ export const CreationPage: FC = () => {
                     <FormLabel>Викладач</FormLabel>
                     <FormControl>
                       <Select onValueChange={(value) => onChange(value)}>
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger>
                           <SelectValue
                             placeholder={
-                              teachers?.find((teacher) => teacher.teacherId.toString() === value)
+                              teachers?.find((teacher) => teacher.teacherId.toString() == value)
                                 ?.initials || 'Оберіть викладача'
                             }
                           />

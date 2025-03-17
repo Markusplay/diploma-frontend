@@ -1,5 +1,5 @@
-import { HomePageCard } from '@/screens/HomePage/components/HomePageCard.tsx';
-import { CARDS } from '@/screens/HomePage/constants.ts';
+import { HomePageCard } from '@/screens/home-page/components/HomePageCard.tsx';
+import { CARDS } from '@/screens/home-page/constants.tsx';
 
 export const HomePage = () => {
   return (
@@ -10,6 +10,7 @@ export const HomePage = () => {
           title={card.title}
           description={card.description}
           link={card.link}
+          icon={card.icon}
         />
       ))}
     </div>

@@ -15,6 +15,7 @@ export interface Workload {
   consultHour: number;
   dkrHour: number;
   rgrHour: number;
+  disciplineVolume: number;
 
   hasExam: boolean;
   hasCredit: boolean;

@@ -10,9 +10,11 @@ import { queryClient } from './lib/queryClient';
 import { K3Page } from './screens/K3Page';
 import { PlanPage } from './screens/PlanPage.tsx';
 import { Toaster } from './components/ui/toaster';
-import { HomePage } from '@/screens/HomePage/HomePage.tsx';
+import { HomePage } from '@/screens/home-page/HomePage.tsx';
 import { CreationPage } from '@/screens/creation-page/CreationPage.tsx';
 import { K4Page } from '@/screens/K4Page.tsx';
+import { K2Page } from '@/screens/K2Page.tsx';
+import { GroupPage } from '@/screens/GroupPage.tsx';
 
 const router = createBrowserRouter([
   {
@@ -31,19 +33,23 @@ const router = createBrowserRouter([
           },
           {
             path: '/k2',
-            element: <K3Page />,
+            element: <K2Page />,
           },
           {
             path: '/k3',
             element: <K3Page />,
           },
           {
-            path: '/k3',
+            path: '/k4',
             element: <K4Page />,
           },
           {
             path: '/plan',
             element: <PlanPage />,
+          },
+          {
+            path: '/group',
+            element: <GroupPage />,
           },
         ],
       },
