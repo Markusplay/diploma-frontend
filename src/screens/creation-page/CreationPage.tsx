@@ -80,15 +80,14 @@ export const CreationPage: FC = () => {
 
   useEffect(() => {
     form.reset();
-  }, [form]);
+  }, []);
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {
-    console.log('clicked');
     const dto: Workload = {
       ...values,
       subjectId: parseInt(values.subjectId),
       groupId: parseInt(values.groupId),
-      teacherId: 23,
+      teacherId: parseInt(values.teacherId),
       cathedra: 'ІСТ',
       paymentForm: values.paymentForm as PaymentForm,
       semester: values.semester as SemesterType,
@@ -106,7 +105,6 @@ export const CreationPage: FC = () => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-8">
-          {/* Основна інформація */}
           <section>
             <h2 className="text-xl font-semibold mb-2">Основна інформація</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-end">
@@ -125,7 +123,7 @@ export const CreationPage: FC = () => {
                             aria-expanded={openSubjectSearch}
                             className="w-full justify-between"
                           >
-                            {subjects?.find((subject) => subject.subjectId.toString() === value)
+                            {subjects?.find((subject) => subject.subjectId.toString() == value)
                               ?.fullName || 'Знайти дисципліну'}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
@@ -231,7 +229,7 @@ export const CreationPage: FC = () => {
                             aria-expanded={openGroupSearch}
                             className="w-full justify-between"
                           >
-                            {groups?.find((group) => group.groupId.toString() === value)
+                            {groups?.find((group) => group.groupId.toString() == value)
                               ?.groupName || 'Оберіть групу'}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
@@ -343,10 +341,10 @@ export const CreationPage: FC = () => {
                     <FormLabel>Викладач</FormLabel>
                     <FormControl>
                       <Select onValueChange={(value) => onChange(value)}>
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger>
                           <SelectValue
                             placeholder={
-                              teachers?.find((teacher) => teacher.teacherId.toString() === value)
+                              teachers?.find((teacher) => teacher.teacherId.toString() == value)
                                 ?.initials || 'Оберіть викладача'
                             }
                           />

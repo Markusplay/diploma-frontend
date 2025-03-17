@@ -11,15 +11,11 @@ import {
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
-  onEdit: (value: TData) => void;
+  onEdit?: (value: TData) => void;
   onDelete?: (value: TData) => void;
 }
 
-const DataTableRowActions = <TData,>({
-  row,
-  onEdit,
-  onDelete,
-}: DataTableRowActionsProps<TData>) => {
+const DataTableRowActions = <TData,>({ row, onDelete }: DataTableRowActionsProps<TData>) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,9 +24,6 @@ const DataTableRowActions = <TData,>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem className="cursor-pointer" onClick={() => onEdit(row.original)}>
-          Змінити
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         {onDelete && (
           <DropdownMenuItem className="cursor-pointer" onClick={() => onDelete(row.original)}>

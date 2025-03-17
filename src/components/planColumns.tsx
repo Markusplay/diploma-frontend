@@ -8,7 +8,7 @@ import { ArrowDown, ArrowUp } from 'lucide-react';
 import DataTableRowActions from './DateTable/DataTableRowActions.tsx';
 
 interface Props {
-  onEdit: (loadItem: PlanItem) => void;
+  onEdit?: (loadItem: PlanItem) => void;
   onDelete?: (loadItem: PlanItem) => void;
   groupsData?: Group[];
   subjectsData?: Subject[];

@@ -5,4 +5,6 @@ export enum QUERY_KEY {
   GROUPS = 'groups',
   SUBJECTS = 'subjects',
   TEACHERS = 'teachers',
+  ANALYZE = 'analyze',
+  ANALYZE_DETAIL = 'analyze_detailed',
 }
